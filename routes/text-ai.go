@@ -9,12 +9,16 @@ import (
 
 func getResultText(context *gin.Context){
 
-	result, err := services.SendPrompt("So sad bro")
+	prompt := context.Query("prompt")
+
+	result, err := services.SendPrompt(prompt)
 
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot get result"})
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"result": result})
+	context.JSON(http.StatusOK, result)
+
 	
 }
