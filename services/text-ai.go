@@ -7,10 +7,9 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
 	"sync"
 
-	"github.com/joho/godotenv"
+	"github.com/Her_feeling/back-end/utils"
 )
 
 type TextResponseData struct {
@@ -26,26 +25,7 @@ func SendPrompt(prompt string) (map[string]float64, error) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
-	go func() {
-		defer wg.Done()
-		err := godotenv.Load()
-		if err != nil {
-			errChan <- errors.New("error loading .env file")
-			return
-		}
-
-		textAIURL, isInEnv := os.LookupEnv("AI_TEXT_URL")
-		if !isInEnv {
-			errChan <- errors.New(".env file has no variable AI_TEXT_URL")
-			
-		}
-		if textAIURL == "" {
-			errChan <- errors.New(".env variable AI_TEXT_URL is empty")
-			return
-		}
-
-		envChan <- textAIURL
-	}()
+	go utils.GetEnv(&wg, envChan, errChan)
 
 	go func() {
 		defer wg.Done()
