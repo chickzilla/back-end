@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sync"
 
 	"github.com/joho/godotenv"
 )
@@ -15,40 +16,71 @@ import (
 type TextResponseData struct {
 	Data []float64 `json:"data"`
 }
+
 // sadness (0), joy (1), love (2), anger (3), fear (4), and surprise (5).
 
 func SendPrompt(prompt string) (map[string]float64, error) {
-	
-	err := godotenv.Load()
-	if err != nil {
-		return nil , errors.New("error loading .env file")
-	}
-	
-	textAIURL := os.Getenv("AI_TEXT_URL")
-	//fmt.Print("textAIURL : ", textAIURL)
+	envChan := make(chan string, 1)
+	errChan := make(chan error, 1)
+	endCodedCh := make(chan string, 1)
+	var wg sync.WaitGroup
+	wg.Add(2)
 
-	if textAIURL == "" {
-		return nil, errors.New(".env variable AI_TEXT_URL is not set")
+	go func() {
+		defer wg.Done()
+		err := godotenv.Load()
+		if err != nil {
+			errChan <- errors.New("error loading .env file")
+			return
+		}
+
+		textAIURL, isInEnv := os.LookupEnv("AI_TEXT_URL")
+		if !isInEnv {
+			errChan <- errors.New(".env file has no variable AI_TEXT_URL")
+			
+		}
+		if textAIURL == "" {
+			errChan <- errors.New(".env variable AI_TEXT_URL is empty")
+			return
+		}
+
+		envChan <- textAIURL
+	}()
+
+	go func() {
+		defer wg.Done()
+		encodedPrompt := url.QueryEscape(prompt)
+		endCodedCh <- encodedPrompt
+	}()
+
+	wg.Wait()
+	close(errChan)
+	close(envChan)
+	close(endCodedCh)
+
+	if err := <-errChan; err != nil {
+		return nil, err
 	}
 
-	// ทำ text ให้อยู่ในรูปแบบ url ( ตัดพวก space --> %20)
-	encodedPrompt := url.QueryEscape(prompt)
+	textAIURL := <-envChan
+	
+	encodedPrompt := <-endCodedCh
+
 	usedURL := fmt.Sprintf("%s/prompt?query=%s", textAIURL, encodedPrompt)
-
-	println("usedURL : ", usedURL)
+	fmt.Println("usedURL ",usedURL )
 
 	response, err := http.Get(usedURL)
 	if err != nil {
-		return nil, errors.New("cant send request to text-ai service")
+		return nil, errors.New("can't send request to text-ai service")
 	}
+	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
-   	if err != nil {
-      return nil, errors.New("cant read response body")
-   	}
+	if err != nil {
+		return nil, errors.New("can't read response body")
+	}
 
 	var responseData TextResponseData
-	// แปลง body ให้เข้า format list ของ float64
 	if err := json.Unmarshal(body, &responseData); err != nil {
 		return nil, errors.New("can't unmarshal response body")
 	}
