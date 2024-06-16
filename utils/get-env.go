@@ -22,7 +22,21 @@ func GetEnv(wg *sync.WaitGroup, envChan chan<- string, errChan chan<- error) {
 			errChan <- errors.New("cannot read AI_TEXT_URL in .env file")
 			return
 		}
-
-
 	envChan <- textAIURL
+}
+
+func GetEnvNoCon(envName string)(envValue string, errs error){
+
+	err := godotenv.Load()
+	if err != nil {
+		return "", errors.New("error while loading .env file")
+	}
+
+	textURL := os.Getenv(envName)
+	if textURL == "" {
+		return "", errors.New("cannot read " + envName + " in .env file")
+	}
+
+	return textURL, nil
+
 }

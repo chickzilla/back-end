@@ -47,7 +47,6 @@ func SendPrompt(prompt string) (map[string]float64, error) {
 	encodedPrompt := <-endCodedCh
 
 	usedURL := fmt.Sprintf("%s/prompt?query=%s", textAIURL, encodedPrompt)
-	fmt.Println("usedURL ",usedURL )
 
 	response, err := http.Get(usedURL)
 	if err != nil {
