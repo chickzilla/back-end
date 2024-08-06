@@ -8,3 +8,7 @@ import (
 func SignUp(context *gin.Context) {
 	services.SignUp(context)
 }
+
+func SignIn(context *gin.Context) {
+	services.SignIn(context)
+}

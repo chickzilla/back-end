@@ -6,17 +6,18 @@ import (
 	"net/mail"
 
 	"github.com/Her_feeling/back-end/database"
+	"github.com/Her_feeling/back-end/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type SignUpRequest struct {
+type AuthRequest struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
 func SignUp(c *gin.Context) {
-	var SignUpRequest SignUpRequest
+	var SignUpRequest AuthRequest
 	var DB = database.DB
 
 	// ถ้า body ที่เข้ามาไม่ตรงกับ user ให้ return 400
@@ -63,6 +64,41 @@ func SignUp(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusBadRequest, gin.H{"error": "email already exists"})
-	return
+}
+
+func SignIn(c *gin.Context) {
+	var signupRequest AuthRequest
+	DB := database.DB
+
+	if err := c.ShouldBindJSON(&signupRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var hashedPassword string
+	err := DB.QueryRow("SELECT password FROM user WHERE email = ?", signupRequest.Email).Scan(&hashedPassword)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "email not found"})
+			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(signupRequest.Password))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "wrong password"})
+		return
+	}
+
+	jwtToken, err := utils.GenerateKey(signupRequest.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"response": jwtToken})
 
 }
