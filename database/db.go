@@ -46,15 +46,16 @@ func createTables() error {
 	}
 
 	createPromptResultLogsTable := `
-	CREATE TABLE IF NOT EXISTS prompt_result_logs (
+	CREATE TABLE IF NOT EXISTS user_history (
 		id INT AUTO_INCREMENT PRIMARY KEY,
 		user_id INT NOT NULL,
 		prompt TEXT NOT NULL,
-		highest_emotion TEXT NOT NULL,
+		love_prob FLOAT(2),
 		sadness_prob FLOAT(2),
 		joy_prob FLOAT(2),
-		anger_prob FLOAT(2),
+		angry_prob FLOAT(2),
 		fear_prob FLOAT(2),
+		surprise_prob FLOAT(2),
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY(user_id) REFERENCES user(id)
 	)
@@ -63,7 +64,7 @@ func createTables() error {
 	_, err = DB.Exec(createPromptResultLogsTable)
 
 	if err != nil {
-		panic("Could not create prompt_result_logs table, error : " + err.Error())
+		panic("Could not create user_history table, error : " + err.Error())
 	}
 
 	fmt.Println("Init table successfully!")
