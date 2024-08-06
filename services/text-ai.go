@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	"github.com/Her_feeling/back-end/database"
-	"github.com/Her_feeling/back-end/utils"
+	utils "github.com/Her_feeling/back-end/utils/helper"
 )
 
 type TextResponseData struct {

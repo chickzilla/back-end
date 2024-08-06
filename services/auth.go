@@ -6,7 +6,7 @@ import (
 	"net/mail"
 
 	"github.com/Her_feeling/back-end/database"
-	"github.com/Her_feeling/back-end/utils"
+	utils "github.com/Her_feeling/back-end/utils/helper"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
