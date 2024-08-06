@@ -12,35 +12,34 @@ import (
 var DB *sql.DB
 
 func InitDB() {
-	dbURL,err := utils.GetEnvNoCon("MYSQL_URL")
+	dbURL, err := utils.GetEnvNoCon("MYSQL_URL")
 	if err != nil {
 		panic("cant get mysql_url in .env file")
 	}
 
-    db, err := sql.Open("mysql", dbURL)
-    if err != nil {
-        panic("Database could not connect, error : " + err.Error())
-    }
+	db, err := sql.Open("mysql", dbURL)
+	if err != nil {
+		panic("Database could not connect, error : " + err.Error())
+	}
 
 	fmt.Println("Connect to database successfully!")
 
-	
-    DB = db
+	DB = db
 	createTables()
 }
 
 func createTables() error {
-	craetedUserTable := `
+	createdUserTable := `
 	CREATE TABLE IF NOT EXISTS user (
-		id VARCHAR(36) PRIMARY KEY,
-		username VARCHAR(20) NOT NULL UNIQUE,
-		password VARCHAR(20) NOT NULL,
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		email VARCHAR(255) NOT NULL UNIQUE,
+		password VARCHAR(255) NOT NULL,
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)
 	`
 
-	_, err := DB.Exec(craetedUserTable)
+	_, err := DB.Exec(createdUserTable)
 
 	if err != nil {
 		panic("Could not create user table, error : " + err.Error())
@@ -48,8 +47,8 @@ func createTables() error {
 
 	createPromptResultLogsTable := `
 	CREATE TABLE IF NOT EXISTS prompt_result_logs (
-		id VARCHAR(36) PRIMARY KEY,
-		user_id VARCHAR(36),
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		user_id INT NOT NULL,
 		prompt TEXT NOT NULL,
 		highest_emotion TEXT NOT NULL,
 		sadness_prob FLOAT(2),
@@ -61,7 +60,7 @@ func createTables() error {
 	)
 	`
 
-	_,err = DB.Exec(createPromptResultLogsTable)
+	_, err = DB.Exec(createPromptResultLogsTable)
 
 	if err != nil {
 		panic("Could not create prompt_result_logs table, error : " + err.Error())

@@ -13,7 +13,14 @@ import (
 )
 
 type TextResponseData struct {
-	Data []float64 `json:"data"`
+	Data struct {
+		Sadness  float64 `json:"sadness"`
+		Joy      float64 `json:"joy"`
+		Love     float64 `json:"love"`
+		Anger    float64 `json:"anger"`
+		Fear     float64 `json:"fear"`
+		Surprise float64 `json:"surprise"`
+	} `json:"data"`
 }
 
 // sadness (0), joy (1), love (2), anger (3), fear (4), and surprise (5).
@@ -43,7 +50,7 @@ func SendPrompt(prompt string) (map[string]float64, error) {
 	}
 
 	textAIURL := <-envChan
-	
+
 	encodedPrompt := <-endCodedCh
 
 	usedURL := fmt.Sprintf("%s/prompt?query=%s", textAIURL, encodedPrompt)
@@ -64,18 +71,13 @@ func SendPrompt(prompt string) (map[string]float64, error) {
 		return nil, errors.New("can't unmarshal response body")
 	}
 
-	emotions := listToMapJSON(responseData.Data)
-	return emotions, nil
-}
-
-func listToMapJSON(data []float64) map[string]float64 {
 	emotions := map[string]float64{
-		"sadness":  data[0],
-		"joy":      data[1],
-		"love":     data[2],
-		"anger":    data[3],
-		"fear":     data[4],
-		"surprise": data[5],
+		"sadness":  responseData.Data.Sadness,
+		"joy":      responseData.Data.Joy,
+		"love":     responseData.Data.Love,
+		"anger":    responseData.Data.Anger,
+		"fear":     responseData.Data.Fear,
+		"surprise": responseData.Data.Surprise,
 	}
-	return emotions
+	return emotions, nil
 }
