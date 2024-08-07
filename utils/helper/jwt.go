@@ -25,3 +25,5 @@ func GenerateKey(email string) (string, error) {
 
 	return tokenSting, nil
 }
+
+// TODO Validate and get data of JWT

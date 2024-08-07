@@ -12,6 +12,7 @@ import (
 
 	"github.com/Her_feeling/back-end/database"
 	utils "github.com/Her_feeling/back-end/utils/helper"
+	"github.com/gin-gonic/gin"
 )
 
 type TextResponseData struct {
@@ -27,7 +28,9 @@ type TextResponseData struct {
 
 // sadness (0), joy (1), love (2), anger (3), fear (4), and surprise (5).
 
-func SendPrompt(prompt string) (map[string]float64, error) {
+func SendPrompt(c *gin.Context) (map[string]float64, error) {
+	prompt := c.Query("prompt")
+
 	envChan := make(chan string, 1)
 	errChan := make(chan error, 1)
 	endCodedCh := make(chan string, 1)
@@ -72,6 +75,10 @@ func SendPrompt(prompt string) (map[string]float64, error) {
 	if err := json.Unmarshal(body, &responseData); err != nil {
 		return nil, errors.New("can't unmarshal response body")
 	}
+
+	/*if auth_token, err := utils.GetCookie("auth_token");err == nil {
+		TODO : validate and get email then craete UserHistory if email exist
+	}*/
 
 	emotions := map[string]float64{
 		"sadness":  responseData.Data.Sadness,

@@ -7,11 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getResultText(context *gin.Context){
+func getResultText(context *gin.Context) {
 
-	prompt := context.Query("prompt")
-
-	result, err := services.SendPrompt(prompt)
+	result, err := services.SendPrompt(context)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -20,5 +18,4 @@ func getResultText(context *gin.Context){
 
 	context.JSON(http.StatusOK, result)
 
-	
 }
