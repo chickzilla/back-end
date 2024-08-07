@@ -16,3 +16,7 @@ func SignIn(context *gin.Context) {
 func SignInWithSSO(context *gin.Context) {
 	services.SignInWithSSO(context)
 }
+
+func SignOut(context *gin.Context) {
+	services.SignOut(context)
+}

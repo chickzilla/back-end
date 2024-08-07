@@ -106,7 +106,10 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"response": jwtToken})
+	// TODO change secure to true when production
+	c.SetCookie("auth_token", jwtToken, 3600, "/", "", false, true)
+
+	c.JSON(http.StatusOK, gin.H{"response": "login success"})
 
 }
 
@@ -146,5 +149,14 @@ func SignInWithSSO(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"response": jwtToken})
+	// TODO change secure to true when production
+	c.SetCookie("auth_token", jwtToken, 3600, "/", "", false, true)
+
+	c.JSON(http.StatusOK, gin.H{"response": "login with SSO success"})
+}
+
+func SignOut(c *gin.Context) {
+	c.SetCookie("auth_token", "", -1, "/", "", false, true)
+	c.JSON(http.StatusOK, gin.H{"message": "Signed out"})
+
 }

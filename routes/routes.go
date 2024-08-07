@@ -7,4 +7,5 @@ func ConfigRouters(server *gin.Engine) {
 	server.POST("/sign-up", SignUp)
 	server.POST("/sign-in", SignIn)
 	server.POST("sign-in-sso", SignInWithSSO)
+	server.POST("/sign-out", SignOut)
 }

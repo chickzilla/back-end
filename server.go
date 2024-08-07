@@ -12,7 +12,13 @@ func main() {
 	database.InitDB()
 	server := gin.Default()
 
-	server.Use(cors.Default())
+	server.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"}, // Your frontend URL
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
+
 	routes.ConfigRouters(server)
 	server.Run(":8080")
 }
