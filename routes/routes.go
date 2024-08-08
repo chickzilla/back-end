@@ -6,7 +6,7 @@ import (
 )
 
 func ConfigRouters(server *gin.Engine) {
-	server.GET("/result-text", middleware.GetEmailFromToken(), getResultText)
+	server.POST("/result-text", middleware.GetEmailFromToken(), getResultText)
 	server.POST("/sign-up", SignUp)
 	server.POST("/sign-in", SignIn)
 	server.POST("sign-in-sso", SignInWithSSO)

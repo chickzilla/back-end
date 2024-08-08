@@ -25,9 +25,15 @@ type TextResponseData struct {
 }
 
 // sadness (0), joy (1), love (2), anger (3), fear (4), and surprise (5).
+type requestText struct {
+	Prompt string `json:"prompt" binding:"required"`
+}
 
 func SendPrompt(c *gin.Context) (map[string]float64, error) {
-	prompt := c.Query("prompt")
+	var promptRequest requestText
+	if err := c.ShouldBindJSON(&promptRequest); err != nil {
+		return nil, errors.New("can't bind json")
+	}
 
 	envChan := make(chan string, 1)
 	errChan := make(chan error, 1)
@@ -39,7 +45,7 @@ func SendPrompt(c *gin.Context) (map[string]float64, error) {
 
 	go func() {
 		defer wg.Done()
-		encodedPrompt := url.QueryEscape(prompt)
+		encodedPrompt := url.QueryEscape(promptRequest.Prompt)
 		endCodedCh <- encodedPrompt
 	}()
 
@@ -76,7 +82,7 @@ func SendPrompt(c *gin.Context) (map[string]float64, error) {
 
 	if email, ok := c.Get("email"); ok {
 		emailString := email.(string)
-		err := CreateUserHistory(emailString, prompt, responseData)
+		err := CreateUserHistory(emailString, promptRequest.Prompt, responseData)
 		fmt.Println("error when create user history: ", err)
 	}
 
