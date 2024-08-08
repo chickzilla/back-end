@@ -76,9 +76,11 @@ func SendPrompt(c *gin.Context) (map[string]float64, error) {
 		return nil, errors.New("can't unmarshal response body")
 	}
 
-	/*if auth_token, err := utils.GetCookie("auth_token");err == nil {
-		TODO : validate and get email then craete UserHistory if email exist
-	}*/
+	if email, ok := c.Get("email"); ok {
+		emailString := email.(string)
+		err := CreateUserHistory(emailString, prompt, responseData)
+		fmt.Println("error when create user history: ", err)
+	}
 
 	emotions := map[string]float64{
 		"sadness":  responseData.Data.Sadness,
@@ -105,7 +107,7 @@ func CreateUserHistory(email, prompt string, response TextResponseData) error {
 		}
 	}
 
-	_, err = DB.Exec("INSERT INTO user_history (user_id, prompt, love_prob, sadness_prob, joy_prob, angry_prob, surprise_prob) VALUES (?, ?, ?, ?, ?, ?, ?)", userId, prompt, moods.Love, moods.Sadness, moods.Joy, moods.Anger, moods.Surprise)
+	_, err = DB.Exec("INSERT INTO user_history (user_id, prompt, love_prob, sadness_prob, joy_prob, angry_prob, surprise_prob, fear_prob) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", userId, prompt, moods.Love, moods.Sadness, moods.Joy, moods.Anger, moods.Surprise, moods.Fear)
 
 	if err != nil {
 		return err

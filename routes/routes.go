@@ -1,9 +1,12 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/Her_feeling/back-end/utils/middleware"
+	"github.com/gin-gonic/gin"
+)
 
 func ConfigRouters(server *gin.Engine) {
-	server.GET("/result-text", getResultText)
+	server.GET("/result-text", middleware.GetEmailFromToken(), getResultText)
 	server.POST("/sign-up", SignUp)
 	server.POST("/sign-in", SignIn)
 	server.POST("sign-in-sso", SignInWithSSO)
