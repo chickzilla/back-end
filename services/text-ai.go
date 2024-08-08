@@ -1,12 +1,12 @@
 package services
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"sync"
 
 	utils "github.com/Her_feeling/back-end/utils/helper"
@@ -37,22 +37,14 @@ func SendPrompt(c *gin.Context) (map[string]float64, error) {
 
 	envChan := make(chan string, 1)
 	errChan := make(chan error, 1)
-	endCodedCh := make(chan string, 1)
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(1)
 
 	go utils.GetEnv(&wg, envChan, errChan)
-
-	go func() {
-		defer wg.Done()
-		encodedPrompt := url.QueryEscape(promptRequest.Prompt)
-		endCodedCh <- encodedPrompt
-	}()
 
 	wg.Wait()
 	close(errChan)
 	close(envChan)
-	close(endCodedCh)
 
 	if err := <-errChan; err != nil {
 		return nil, err
@@ -60,11 +52,16 @@ func SendPrompt(c *gin.Context) (map[string]float64, error) {
 
 	textAIURL := <-envChan
 
-	encodedPrompt := <-endCodedCh
+	// Prepare the POST request body
+	requestBody, err := json.Marshal(promptRequest)
+	if err != nil {
+		return nil, errors.New("can't marshal request body")
+	}
 
-	usedURL := fmt.Sprintf("%s/prompt?query=%s", textAIURL, encodedPrompt)
+	usedURL := fmt.Sprintf("%s/prompt", textAIURL)
 
-	response, err := http.Get(usedURL)
+	// Send POST request
+	response, err := http.Post(usedURL, "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, errors.New("can't send request to text-ai service")
 	}
@@ -83,7 +80,9 @@ func SendPrompt(c *gin.Context) (map[string]float64, error) {
 	if email, ok := c.Get("email"); ok {
 		emailString := email.(string)
 		err := CreateUserHistory(emailString, promptRequest.Prompt, responseData)
-		fmt.Println("error when create user history: ", err)
+		if err != nil {
+			fmt.Println("error when create user history: ", err)
+		}
 	}
 
 	emotions := map[string]float64{
