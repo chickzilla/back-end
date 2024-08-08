@@ -3,8 +3,11 @@ package services
 import (
 	"database/sql"
 	"errors"
+	"net/http"
 
 	"github.com/Her_feeling/back-end/database"
+	"github.com/Her_feeling/back-end/database/entities"
+	"github.com/gin-gonic/gin"
 )
 
 func CreateUserHistory(email, prompt string, response TextResponseData) error {
@@ -28,4 +31,43 @@ func CreateUserHistory(email, prompt string, response TextResponseData) error {
 	}
 
 	return nil
+}
+
+func GetUserHistories(context *gin.Context) {
+	var DB = database.DB
+
+	userId, _ := context.Get("userId")
+
+	rows, err := DB.Query("SELECT * FROM user_history WHERE user_id = ?", userId.(int))
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	defer rows.Close()
+
+	var histories []entities.UserHistory
+
+	for rows.Next() {
+		var history entities.UserHistory
+		if err := rows.Scan(
+			&history.ID,
+			&history.UserId,
+			&history.Prompt,
+			&history.LoveProb,
+			&history.SadnessProb,
+			&history.JoyProb,
+			&history.AngryProb,
+			&history.FearProb,
+			&history.SurpriseProb,
+			&history.CreatedAt); err != nil {
+
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		histories = append(histories, history)
+	}
+
+	context.JSON(http.StatusOK, gin.H{"data": histories})
+
 }

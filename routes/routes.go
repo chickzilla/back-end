@@ -11,4 +11,5 @@ func ConfigRouters(server *gin.Engine) {
 	server.POST("/sign-in", SignIn)
 	server.POST("sign-in-sso", SignInWithSSO)
 	server.POST("/sign-out", SignOut)
+	server.GET("/histories", middleware.GetEmailFromToken(), middleware.AuthMiddleWare(), GetHistories)
 }
