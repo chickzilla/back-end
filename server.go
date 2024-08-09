@@ -1,8 +1,11 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/Her_feeling/back-end/database"
 	"github.com/Her_feeling/back-end/routes"
+	utils "github.com/Her_feeling/back-end/utils/helper"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -12,8 +15,12 @@ func main() {
 	database.InitDB()
 	server := gin.Default()
 
+	whiteList, _ := utils.GetEnvNoCon("WHITE_LIST")
+
+	whiteList = strings.TrimSuffix(whiteList, ",")
+
 	server.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"}, // Your frontend URL
+		AllowOrigins:     strings.Split(whiteList, ","),
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: true,
