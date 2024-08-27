@@ -22,7 +22,7 @@ func InitDB() {
 		panic("Database could not connect, error : " + err.Error())
 	}
 
-	fmt.Println("Connect to database successfully!")
+	fmt.Println("Connect to database successfully!!!!!")
 
 	DB = db
 	createTables()
@@ -68,7 +68,7 @@ func createTables() error {
 		panic("Could not create user_history table, error : " + err.Error())
 	}
 
-	fmt.Println("Init table successfully!")
+	fmt.Println("Init table successfully!!!!")
 
 	return err
 

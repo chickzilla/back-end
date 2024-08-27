@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Her_feeling/back-end/database"
@@ -16,6 +17,8 @@ func GetEmailFromToken() gin.HandlerFunc {
 		if err != nil {
 			token = ""
 		}
+
+		fmt.Println("token", token)
 
 		email := utils.ValidateJWTToken(token)
 

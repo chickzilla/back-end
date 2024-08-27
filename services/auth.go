@@ -2,6 +2,7 @@ package services
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"net/mail"
 
@@ -20,12 +21,10 @@ func SignUp(c *gin.Context) {
 	var SignUpRequest AuthRequest
 	var DB = database.DB
 
-	// ถ้า body ที่เข้ามาไม่ตรงกับ user ให้ return 400
 	if err := c.ShouldBindJSON(&SignUpRequest); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	// ตอนนี้ request มี email และ password แล้ว
 
 	if _, err := mail.ParseAddress(SignUpRequest.Email); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
@@ -67,6 +66,8 @@ func SignUp(c *gin.Context) {
 }
 
 func SignIn(c *gin.Context) {
+	fmt.Println("new version none mode 2")
+
 	var signupRequest AuthRequest
 	DB := database.DB
 
@@ -106,10 +107,12 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	// TODO change secure to true when production
-	c.SetCookie("auth_token", jwtToken, 3600, "/", "", false, true)
+	/*
+		domain, _ := utils.GetEnvNoCon("DOMAIN_URL")
+		c.SetSameSite(http.SameSiteNoneMode)
+		c.SetCookie("auth_token", jwtToken, 3600*24*30, "/", domain, true, false)*/
 
-	c.JSON(http.StatusOK, gin.H{"response": "login success"})
+	c.JSON(http.StatusOK, gin.H{"response": jwtToken})
 
 }
 
@@ -118,6 +121,9 @@ type AuthSSORequest struct {
 }
 
 func SignInWithSSO(c *gin.Context) {
+
+	fmt.Println("new version none mode 2")
+
 	var SSORequest AuthSSORequest
 	DB := database.DB
 
@@ -149,14 +155,21 @@ func SignInWithSSO(c *gin.Context) {
 		return
 	}
 
-	// TODO change secure to true when production
-	c.SetCookie("auth_token", jwtToken, 3600, "/", "", false, true)
-
-	c.JSON(http.StatusOK, gin.H{"response": "login with SSO success"})
+	/*
+		domain, _ := utils.GetEnvNoCon("DOMAIN_URL")
+		c.SetCookie("auth_token", jwtToken, 3600*24*30, "/", domain, true, false)
+	*/
+	c.JSON(http.StatusOK, gin.H{"response": jwtToken})
 }
 
 func SignOut(c *gin.Context) {
-	c.SetCookie("auth_token", "", -1, "/", "", false, true)
+	fmt.Println("new version none mode")
+
+	/*
+		domain, _ := utils.GetEnvNoCon("DOMAIN_URL")
+		c.SetCookie("auth_token", "", -1, "/", domain, false, true)
+	*/
+
 	c.JSON(http.StatusOK, gin.H{"message": "Signed out"})
 
 }

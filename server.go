@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/Her_feeling/back-end/database"
@@ -14,6 +15,7 @@ func main() {
 
 	database.InitDB()
 	server := gin.Default()
+	fmt.Println("Server already deploy with cloud build")
 
 	whiteList, _ := utils.GetEnvNoCon("WHITE_LIST")
 

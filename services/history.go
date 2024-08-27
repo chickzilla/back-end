@@ -18,6 +18,8 @@ func CreateUserHistory(email, prompt string, response TextResponseData) error {
 	var userId string
 	moods := response.Data
 
+	fmt.Print("email test when create history", email)
+
 	err := DB.QueryRow("SELECT id FROM user WHERE email = ?", email).Scan(&userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -100,14 +102,14 @@ func GetUserHistories(context *gin.Context) {
 		ORDER BY `+sortBy+` `+orderBy+`
 		LIMIT ? OFFSET ?`, userId.(int), limit, offset)
 
-	if err != nil {
+	var histories []entities.UserHistory
+
+	if err != nil && err != sql.ErrNoRows {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	defer rows.Close()
-
-	var histories []entities.UserHistory
 
 	for rows.Next() {
 		var history entities.UserHistory
