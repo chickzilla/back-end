@@ -11,7 +11,7 @@ steps:
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: ['run', 'deploy', 'her-feeling-server', '--image', 'gcr.io/her-feeling/text-moods-api', '--region', 'asia-southeast1']
+    args: ['run', 'deploy', 'her-feeling-server', '--image', 'gcr.io/her-feeling/text-moods-api', '--region', 'asia-southeast1', '--port', '8080']
 
 images:
   - gcr.io/her-feeling/text-moods-api
