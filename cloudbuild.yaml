@@ -4,14 +4,14 @@ options:
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/PROJECT_ID/IMAGE', '.']
+    args: ['build', '-t', 'gcr.io/her-feeling/text-moods-api', '.']
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/PROJECT_ID/IMAGE']
+    args: ['push', 'gcr.io/her-feeling/text-moods-api']
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: ['run', 'deploy', 'SERVICE_NAME', '--image', 'gcr.io/PROJECT_ID/IMAGE', '--region', 'SERVICE_REGION']
+    args: ['run', 'deploy', 'her-feeling-server', '--image', 'gcr.io/her-feeling/text-moods-api', '--region', 'asia-southeast1']
 
 images:
-  - gcr.io/PROJECT_ID/IMAGE
+  - gcr.io/her-feeling/text-moods-api
