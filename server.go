@@ -34,5 +34,8 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	server.Run(":" + port)
+	err := server.Run(":" + port)
+	if err != nil {
+		panic(err)
+	}
 }
