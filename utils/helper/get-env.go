@@ -9,7 +9,7 @@ import (
 )
 
 func GetEnv(wg *sync.WaitGroup, envChan chan<- string, errChan chan<- error) {
-	defer wg.Done() 
+	defer wg.Done()
 
 	err := godotenv.Load()
 	if err != nil {
@@ -18,19 +18,19 @@ func GetEnv(wg *sync.WaitGroup, envChan chan<- string, errChan chan<- error) {
 	}
 
 	textAIURL := os.Getenv("AI_TEXT_URL")
-		if textAIURL == ""{
-			errChan <- errors.New("cannot read AI_TEXT_URL in .env file")
-			return
-		}
+	if textAIURL == "" {
+		errChan <- errors.New("cannot read AI_TEXT_URL in .env file")
+		return
+	}
 	envChan <- textAIURL
 }
 
-func GetEnvNoCon(envName string)(envValue string, errs error){
+func GetEnvNoCon(envName string) (envValue string, errs error) {
 
-	err := godotenv.Load()
+	/*err := godotenv.Load()
 	if err != nil {
 		return "", errors.New("error while loading .env file")
-	}
+	}*/
 
 	textURL := os.Getenv(envName)
 	if textURL == "" {
