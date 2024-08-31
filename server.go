@@ -28,6 +28,11 @@ func main() {
 		AllowCredentials: true,
 	}))
 
+	port, _ := utils.GetEnvNoCon("PORT")
+
 	routes.ConfigRouters(server)
-	server.Run(":8080")
+	if port == "" {
+		port = "8080"
+	}
+	server.Run(":" + port)
 }
