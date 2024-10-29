@@ -3,7 +3,7 @@ name: Build image
 on:
   push:
     branches:
-      - main
+      - feat/implement-ci
 
   workflow_dispatch:
 
