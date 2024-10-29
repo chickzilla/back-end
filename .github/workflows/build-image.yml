@@ -26,14 +26,7 @@ jobs:
           docker rmi ${{ secrets.DOCKER_USERNAME }}/her-feeling-server:latest || echo "Image not found, skipping deletion"
       - name: Build Docker image
         run: |
-          docker build -t her-feeling-server:latest .
-      # - name: Push Docker image
-      #   run: |
-      #     docker push /her-feeling-server:latest
-      - name: Tag Docker image with username/repo
-        run: |
-          docker tag her-feeling-server:latest ${{ secrets.DOCKER_USERNAME }}/her-feeling-server:latest
-
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/her-feeling-server:latest .
       - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/her-feeling-server:latest
