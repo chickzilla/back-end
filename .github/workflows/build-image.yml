@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Delete Old version of Docker image
         run: |
-          docker rmi her-feeling-server:latest
+          docker rmi her-feeling-server:latest || echo "Image not found, skipping deletion"
       - name: Build Docker image
         run: |
           docker build -t her-feeling-server:latest .
